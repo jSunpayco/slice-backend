@@ -17,6 +17,13 @@ const getRecipes = async (req,res)=>{
     }
 };
 
+const getRecipeById = async(req,res) => {
+    const id = req.params.id;
+    const response = await client.query('SELECT * FROM recipes WHERE recipe_id = $1',[id]);
+    res.json(response.rows);
+};
+
 module.exports ={
-    getRecipes
+    getRecipes,
+    getRecipeById
 }
