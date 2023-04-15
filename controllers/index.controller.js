@@ -23,7 +23,21 @@ const getRecipeById = async(req,res) => {
     res.json(response.rows);
 };
 
+const createRecipe = async (req,res)=>{
+    const {recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration} = req.body;
+    const response = await client.query('INSERT INTO recipes(recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
+        [recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration ]);
+    // console.log(response);
+    res.json({
+        message: 'Recipe Added Successfully',
+        body:{
+            recipe:{recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration}
+        }
+    });
+};
+
 module.exports ={
     getRecipes,
-    getRecipeById
+    getRecipeById,
+    createRecipe
 }
