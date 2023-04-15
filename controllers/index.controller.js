@@ -36,8 +36,15 @@ const createRecipe = async (req,res)=>{
     });
 };
 
+const deleteRecipe = async(req,res) =>{
+    const id = req.params.id;
+    const response = await client.query('DELETE FROM recipes WHERE recipe_id = $1',[id]);
+    res.json(`Recipe ${id} deleted successfully`);
+};
+
 module.exports ={
     getRecipes,
     getRecipeById,
-    createRecipe
+    createRecipe,
+    deleteRecipe
 }
