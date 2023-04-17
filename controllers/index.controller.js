@@ -23,6 +23,12 @@ const getRecipeById = async(req,res) => {
     res.json(response.rows);
 };
 
+const getRecipeByUser = async(req,res) => {
+    const author = req.params.author;
+    const response = await client.query('SELECT * FROM recipes WHERE author = $1',[author]);
+    res.json(response.rows);
+};
+
 const createRecipe = async (req,res)=>{
     const {recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration} = req.body;
     const response = await client.query('INSERT INTO recipes(recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
@@ -55,5 +61,6 @@ module.exports ={
     getRecipeById,
     createRecipe,
     deleteRecipe,
-    updateRecipe
+    updateRecipe,
+    getRecipeByUser
 }
