@@ -12,7 +12,8 @@ const getRecipes = async (req,res)=>{
 
         let filters = '';
         if (course) {
-            filters += `WHERE course = '${course}'`;
+            let courseFilter = course.replace(/([a-z])([A-Z])/g, '$1 $2')
+            filters += `WHERE course = '${courseFilter}'`;
         }
         if (servings) {
             filters += filters.length ? ` AND servings = '${servings}'` : `WHERE servings = '${servings}'`;
