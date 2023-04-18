@@ -8,7 +8,17 @@ client.connect();
 const getRecipes = async (req,res)=>{
     try
     {
-        const response = await client.query('SELECT * FROM recipes');
+        const { course, servings } = req.query;
+
+        let filters = '';
+        if (course) {
+            filters += `WHERE course = '${course}'`;
+        }
+        if (servings) {
+            filters += filters.length ? ` AND servings = '${servings}'` : `WHERE servings = '${servings}'`;
+        }
+
+        const response = await client.query(`SELECT * FROM recipes ${filters}`);
         res.status(200).json(response.rows);
     }
     catch(error){
