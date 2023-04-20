@@ -8,7 +8,7 @@ client.connect();
 const getRecipes = async (req,res)=>{
     try
     {
-        const { course, servings } = req.query;
+        const { course, servings, allergen } = req.query;
 
         let filters = '';
         if (course) {
@@ -17,6 +17,11 @@ const getRecipes = async (req,res)=>{
         }
         if (servings) {
             filters += filters.length ? ` AND servings = '${servings}'` : `WHERE servings = '${servings}'`;
+        }
+        if (allergen) {
+            allergens = allergen.split(',');
+            allergenList = allergens.map((value, index) => index < 1 ? `WHERE NOT ('${value}' = ANY (allergens))` : `AND NOT ('${value}' = ANY (allergens))`).join(' ')
+            filters += allergenList
         }
 
         const response = await client.query(`SELECT * FROM recipes ${filters}`);
