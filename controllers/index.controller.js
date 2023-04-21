@@ -20,7 +20,7 @@ const getRecipes = async (req,res)=>{
         }
         if (allergen) {
             allergens = allergen.split(',');
-            allergenList = allergens.map((value, index) => index < 1 ? `WHERE NOT ('${value}' = ANY (allergens))` : `AND NOT ('${value}' = ANY (allergens))`).join(' ')
+            allergenList = allergens.map((value) => filters.length ? ` AND NOT ('${value}' = ANY (allergens))` : `WHERE NOT ('${value}' = ANY (allergens))`).join(' ')
             filters += allergenList
         }
         if (protein) {
