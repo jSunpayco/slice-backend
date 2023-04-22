@@ -46,7 +46,7 @@ const getRecipes = async (req,res)=>{
         res.status(200).json(response.rows);
     }
     catch(error){
-        console.log(error);
+        // console.log(error);
         res.send("Error: "+error);
     }
 };
@@ -86,7 +86,7 @@ const updateRecipe = async(req,res) => {
     const id = req.params.id;
     const {recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration} = req.body;
     const response = await client.query('UPDATE recipes SET name = $2, author=$3, allergens=$4, course=$5, about=$6, protein=$7, ismeat=$8, servings=$9, ismins=$10, duration=$11 WHERE recipe_id = $1',[recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration]);
-    console.log(response);
+    // console.log(response);
     res.json('Recipe updated successfully');
 };
 
