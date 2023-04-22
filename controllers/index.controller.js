@@ -8,7 +8,7 @@ client.connect();
 const getRecipes = async (req,res)=>{
     try
     {
-        const { course, servings, allergen, protein } = req.query;
+        const { course, servings, allergen, protein, limit } = req.query;
 
         let filters = '';
         if (course) {
@@ -37,6 +37,9 @@ const getRecipes = async (req,res)=>{
                     filters += ` OR ('${proteins[i]}' = ANY (protein))`
                 }
             }
+        }
+        if(limit){
+            filters += `LIMIT '${limit}'`;
         }
         
         const response = await client.query(`SELECT * FROM recipes ${filters}`);
