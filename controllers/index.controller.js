@@ -25,10 +25,20 @@ const getRecipes = async (req,res)=>{
         }
         if (protein) {
             proteins = protein.split(',');
-            proteinList = proteins.map((value, index) => filters.length ? `WHERE ('${value}' = ANY (protein))` : index < 1 ? `AND ('${value}' = ANY (protein))` : `OR ('${value}' = ANY (protein))`).join(' ')
-            filters += proteinList
+            
+            for(let i = 0; i < proteins.length; i++){
+                if(!filters.length){
+                    filters += `WHERE ('${proteins[i]}' = ANY (protein))`
+                }
+                else if(i < 1){
+                    filters += ` AND ('${proteins[i]}' = ANY (protein))`
+                }
+                else{
+                    filters += ` OR ('${proteins[i]}' = ANY (protein))`
+                }
+            }
         }
-
+        
         const response = await client.query(`SELECT * FROM recipes ${filters}`);
         res.status(200).json(response.rows);
     }
