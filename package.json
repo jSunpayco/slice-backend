@@ -4,7 +4,7 @@
   "description": "Backend component for Slice",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "jSunpayco",
   "license": "ISC",
@@ -15,6 +15,7 @@
     "jest": "^29.5.0",
     "pg": "^8.10.0",
     "pg-promise": "^11.4.3",
-    "sequelize": "^6.31.0"
+    "sequelize": "^6.31.0",
+    "supertest": "^6.3.3"
   }
 }
