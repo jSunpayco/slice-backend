@@ -1,7 +1,9 @@
-const { Router} =  require('express');
-const router = Router();
+const express = require("express");
+const router = express.Router();
 
 const { getRecipes, getRecipeById, createRecipe, deleteRecipe, updateRecipe, getRecipeByUser } = require('../controllers/index.controller');
+
+router.use(express.json());
 
 router.get('/recipes',getRecipes);
 router.get('/recipes/:id',getRecipeById);
