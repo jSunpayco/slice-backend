@@ -53,18 +53,25 @@ describe('All tests', () => {
     expect(response.body.body.recipe).toEqual(newRecipe);
   })
 
+  test('updates the servings from 5-6 to 3-4', async () => {
+    const response = await request(app).put('/recipes/21').send(updatedRecipe);
+
+    expect(response.statusCode).toBe(200)
+    expect(response.body).toEqual('Recipe updated successfully');
+  });
+
   test('retrieves the new recipe', async () => {
     const response = await request(app).get('/recipes/21');
 
     expect(response.statusCode).toBe(200)
     expect(response.body.length).toBeGreaterThan(0);
-    expect(response.body[0]).toEqual(newRecipe);
+    expect(response.body[0]).toEqual(updatedRecipe);
   });
 
-  test('updates the servings from 5-6 to 3-4', async () => {
-    const response = await request(app).put('/recipes/21').send(updatedRecipe);
+  test('deletes the new recipe', async () => {
+    const response = await request(app).delete('/recipes/21');
 
     expect(response.statusCode).toBe(200)
-    expect(response.body.body.recipe).toEqual('Recipe updated successfully');
+    expect(response.body).toEqual('Recipe 21 deleted successfully');
   });
 });
