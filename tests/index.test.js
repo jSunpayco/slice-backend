@@ -47,11 +47,7 @@ describe('All tests', () => {
   })
 
   test('creates a new recipe', async () => {
-    const dataString = JSON.stringify(newRecipe);
-    const contentLength = Buffer.byteLength(dataString, 'utf8');
-    
-    const response = await request(app).post('/recipes')
-      .set('Content-Type', 'application/json').set('Content-Length', contentLength).send(newRecipe);
+    const response = await request(app).post('/recipes').send(newRecipe);
 
     expect(response.statusCode).toBe(200)
     expect(response.body.body.recipe).toEqual(newRecipe);
@@ -66,8 +62,7 @@ describe('All tests', () => {
   });
 
   test('updates the servings from 5-6 to 3-4', async () => {
-    const response = await request(app).put('/recipes/21')
-      .set('Content-Type', 'application/json').set('Content-Length', contentLength).send(updatedRecipe);
+    const response = await request(app).put('/recipes/21').send(updatedRecipe);
 
     expect(response.statusCode).toBe(200)
     expect(response.body.body.recipe).toEqual('Recipe updated successfully');
