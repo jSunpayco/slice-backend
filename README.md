@@ -8,5 +8,5 @@ npm i
 
 ## Usage
 ```
-npm index.js
+node index.js
 ```
