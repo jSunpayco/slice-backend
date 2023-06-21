@@ -112,9 +112,23 @@ const deleteRecipe = async(req,res) =>{
 
 const updateRecipe = async(req,res) => {
     try{
-        const id = req.params.id;
-        const {recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration} = req.body;
-        const response = await client.query('UPDATE recipes SET name = $2, author=$3, allergens=$4, course=$5, about=$6, protein=$7, ismeat=$8, servings=$9, ismins=$10, duration=$11 WHERE recipe_id = $1',[recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration]);
+        const { updates } = req.body;
+
+        let query = 'UPDATE recipes SET ';
+        const values = [];
+        const updateClauses = [];
+
+        updates.forEach((update, index) => {
+            const { column, value } = update;
+            values.push(value);
+            updateClauses.push(`${column} = $${index + 1}`);
+        });
+
+        query += updateClauses.join(', ');
+        query += ' WHERE recipe_id = $' + (updates.length + 1);
+        values.push(req.params.id);
+        
+        const response = await client.query(query,values);
         res.json('Recipe updated successfully');
     }
     catch(error){
