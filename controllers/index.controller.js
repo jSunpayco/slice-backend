@@ -53,7 +53,17 @@ const getRecipes = async (req,res)=>{
 const getRecipeById = async(req,res) => {
     try{
         const id = req.params.id;
-        const response = await client.query('SELECT * FROM recipes WHERE recipe_id = $1',[id]);
+        const sqlQuery = `SELECT *, 
+                                (SELECT ARRAY_AGG(DISTINCT i.ingredient) 
+                                FROM ingredients i 
+                                WHERE i.recipe_id = r.recipe_id) AS ingredients,
+                                (SELECT ARRAY_AGG(DISTINCT s.description) 
+                                FROM steps s 
+                                WHERE s.recipe_id = r.recipe_id) AS steps
+                            FROM recipes r
+                            WHERE r.recipe_id = $1;
+                        `;
+        const response = await client.query(sqlQuery,[id]);
         res.json(response.rows);
     }
     catch(error){
