@@ -57,7 +57,7 @@ const getRecipes = async (req,res)=>{
 const getRecipeById = async(req,res) => {
     try{
         const id = req.params.id;
-        const response = await client.query('SELECT * FROM recipes WHERE recipe_id = $1;',[id]);
+        const response = await client.query('SELECT * FROM recipes WHERE recipe_id = $1',[id]);
         res.json(response.rows);
     }
     catch(error){
@@ -68,7 +68,16 @@ const getRecipeById = async(req,res) => {
 const getRecipeByUser = async(req,res) => {
     try{
         const author = req.params.author;
-        const response = await client.query('SELECT * FROM recipes WHERE author = $1 ORDER BY added',[author]);
+        const { limit, offset } = req.query;
+
+        let getQuery = `SELECT * FROM recipes WHERE author = $1 ORDER BY added`
+
+        if(limit)
+            getQuery += ` LIMIT '${limit}'`;
+        if(offset)
+            getQuery += ` OFFSET '${offset}'`;
+
+        const response = await client.query(getQuery,[author]);
         res.json(response.rows);
     }
     catch(error){
