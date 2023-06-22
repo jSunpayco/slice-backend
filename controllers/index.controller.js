@@ -8,7 +8,7 @@ client.connect();
 const getRecipes = async (req,res)=>{
     try
     {
-        const { course, servings, allergen, protein, limit } = req.query;
+        const { course, servings, allergen, protein, limit, offset } = req.query;
 
         let filters = '';
         if (course) {
@@ -41,6 +41,9 @@ const getRecipes = async (req,res)=>{
         let getQuery = `SELECT * FROM recipes ${filters} ORDER BY added`
         if(limit){
             getQuery += ` LIMIT '${limit}'`;
+        }
+        if(offset){
+            getQuery += ` OFFSET '${offset}'`;
         }
         
         const response = await client.query(getQuery);
