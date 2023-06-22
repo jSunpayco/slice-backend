@@ -42,7 +42,7 @@ const getRecipes = async (req,res)=>{
             filters += `LIMIT '${limit}'`;
         }
         
-        const response = await client.query(`SELECT * FROM recipes ${filters}`);
+        const response = await client.query(`SELECT * FROM recipes ${filters} ORDER BY added`);
         res.status(200).json(response.rows);
     }
     catch(error){
@@ -64,7 +64,7 @@ const getRecipeById = async(req,res) => {
 const getRecipeByUser = async(req,res) => {
     try{
         const author = req.params.author;
-        const response = await client.query('SELECT * FROM recipes WHERE author = $1',[author]);
+        const response = await client.query('SELECT * FROM recipes WHERE author = $1 ORDER BY added',[author]);
         res.json(response.rows);
     }
     catch(error){
@@ -74,13 +74,17 @@ const getRecipeByUser = async(req,res) => {
 
 const createRecipe = async (req,res)=>{
     try{
-        const {recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration} = req.body;
-        const response = await client.query('INSERT INTO recipes(recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
-            [recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration ]);
+        const {recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration, ingredients, steps} = req.body;
+
+        let createQuery = 'INSERT INTO recipes(recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration, ingredients, steps, added)';
+        createQuery += ' VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CURRENT_TIMESTAMP::timestamp)';
+        let createValues = [recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration, ingredients, steps];
+
+        const response = await client.query(createQuery, createValues);
         res.status(200).json({
             message: 'Recipe Added Successfully',
             body:{
-                recipe:{recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration}
+                recipe:{recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration, ingredients, steps}
             }
         });
     }
@@ -108,22 +112,19 @@ const updateRecipe = async(req,res) => {
         const values = [];
         const updateClauses = [];
 
-        updates.forEach((update, index) => {
-            const { column, value } = update;
+        for (const column in updates) {
+            const value = updates[column];
             values.push(value);
-            updateClauses.push(`${column} = $${index + 1}`);
-        });
-
+            updateClauses.push(`${column} = $${values.length}`);
+        }
+        
         query += updateClauses.join(', ');
-        query += ' WHERE recipe_id = $' + (updates.length + 1);
+        query += ` WHERE recipe_id = $${values.length + 1}`;
         values.push(req.params.id);
         
-        const response = await client.query(query,values);
+        const response = await client.query(query, values);
         res.status(200).json({
-            message: 'Recipe updated Successfully',
-            body:{
-                response:response["rows"]
-            }
+            message: 'Recipe updated successfully'
         });
     }
     catch(error){
