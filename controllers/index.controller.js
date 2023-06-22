@@ -38,11 +38,12 @@ const getRecipes = async (req,res)=>{
                 }
             }
         }
+        let getQuery = `SELECT * FROM recipes ${filters} ORDER BY added`
         if(limit){
-            filters += `LIMIT '${limit}'`;
+            getQuery += ` LIMIT '${limit}'`;
         }
         
-        const response = await client.query(`SELECT * FROM recipes ${filters} ORDER BY added`);
+        const response = await client.query(getQuery);
         res.status(200).json(response.rows);
     }
     catch(error){
