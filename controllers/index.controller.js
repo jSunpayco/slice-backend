@@ -93,7 +93,7 @@ const getRecipes = async (req,res)=>{
     {
         const { course, servings, allergen, protein, limit, offset } = req.query;
 
-        let getQuery = `SELECT * FROM recipes ${applyMultipleFlters(course, servings, allergen, protein)} ORDER BY added`
+        let getQuery = `SELECT * FROM recipes ${applyMultipleFlters(course, servings, allergen, protein, false)} ORDER BY added`
 
         getQuery += applyPagination(limit, offset)
 
@@ -107,15 +107,14 @@ const getRecipes = async (req,res)=>{
 
 const getRecipeByUser = async(req,res) => {
     try{
-        const author = req.params.author;
-        const { limit, offset } = req.query;
+        const { course, servings, allergen, protein, limit, offset } = req.query;
 
-        let getQuery = `SELECT * FROM recipes ${applyMultipleFlters(course, servings, allergen, protein)} ORDER BY added`
+        let getQuery = `SELECT * FROM recipes ${applyMultipleFlters(course, servings, allergen, protein, true)} ORDER BY added`
 
         getQuery += applyPagination(limit, offset)
 
-        const response = await client.query(getQuery,[author]);
-        res.json(response.rows);
+        const response = await client.query(getQuery,[req.params.author]);
+        res.status(200).json(response.rows);
     }
     catch(error){
         res.send("Error: "+error);
