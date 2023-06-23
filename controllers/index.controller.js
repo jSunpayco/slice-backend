@@ -61,9 +61,15 @@ const applyMultipleFlters = (course, servings, allergen, protein, isUsers) => {
         filters += ')';
     }
     if (allergen) {
-        allergens = allergen.split(',');
-        allergenList = allergens.map((value) => filters.length ? ` AND NOT ('${value}' = ANY (allergens))` : `WHERE NOT ('${value}' = ANY (allergens))`).join(' ');
-        filters += allergenList;
+        allergen = allergen.split(',');
+        for(let i = 0; i < allergen.length; i++){
+            if(!filters.length){
+                filters += `WHERE NOT ('${allergen[i]}' = ANY (allergens))` 
+            }
+            else{
+                filters += ` AND NOT ('${allergen[i]}' = ANY (allergens))`
+            }
+        }
     }
 
     return filters;
@@ -90,7 +96,7 @@ const getRecipes = async (req,res)=>{
         let getQuery = `SELECT * FROM recipes ${applyMultipleFlters(course, servings, allergen, protein)} ORDER BY added`
 
         getQuery += applyPagination(limit, offset)
-        
+
         const response = await client.query(getQuery);
         res.status(200).json(response.rows);
     }
