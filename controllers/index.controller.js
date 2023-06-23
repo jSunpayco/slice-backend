@@ -12,31 +12,56 @@ const getRecipes = async (req,res)=>{
 
         let filters = '';
         if (course) {
-            let courseFilter = course.replace(/([a-z])([A-Z])/g, '$1 $2')
-            filters += `WHERE course = '${courseFilter}'`;
+            course = course.split(',');
+            for(let i = 0; i<course.length; i++){
+                let courseFilter = course[i].replace(/([a-z])([A-Z])/g, '$1 $2')
+                if(!filters.length){
+                    filters += `WHERE (course = '${courseFilter}'`
+                }
+                else if(i < 1){
+                    filters += ` AND (course = '${courseFilter}'`
+                }
+                else{
+                    filters += ` OR course = '${courseFilter}'`
+                }
+            }
+            filters += ')'
         }
         if (servings) {
-            filters += filters.length ? ` AND servings = '${servings}'` : `WHERE servings = '${servings}'`;
-        }
-        if (allergen) {
-            allergens = allergen.split(',');
-            allergenList = allergens.map((value) => filters.length ? ` AND NOT ('${value}' = ANY (allergens))` : `WHERE NOT ('${value}' = ANY (allergens))`).join(' ')
-            filters += allergenList
+            course = servings.split(',');
+            for(let i = 0; i<course.length; i++){
+                if(!filters.length){
+                    filters += `WHERE (servings = '${servings}'`
+                }
+                else if(i < 1){
+                    filters += ` AND (servings = '${servings}'`
+                }
+                else{
+                    filters += ` OR servings = '${servings}'`
+                }
+            }
+            filters += ')'
         }
         if (protein) {
             proteins = protein.split(',');
             
             for(let i = 0; i < proteins.length; i++){
                 if(!filters.length){
-                    filters += `WHERE ('${proteins[i]}' = ANY (protein))`
+                    filters += `WHERE (('${proteins[i]}' = ANY (protein))`
                 }
                 else if(i < 1){
-                    filters += ` AND ('${proteins[i]}' = ANY (protein))`
+                    filters += ` AND (('${proteins[i]}' = ANY (protein))`
                 }
                 else{
                     filters += ` OR ('${proteins[i]}' = ANY (protein))`
                 }
             }
+            filters += ')'
+        }
+        if (allergen) {
+            allergens = allergen.split(',');
+            allergenList = allergens.map((value) => filters.length ? ` AND NOT ('${value}' = ANY (allergens))` : `WHERE NOT ('${value}' = ANY (allergens))`).join(' ')
+            filters += allergenList
         }
         let getQuery = `SELECT * FROM recipes ${filters} ORDER BY added`
         if(limit){
