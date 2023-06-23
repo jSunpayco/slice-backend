@@ -5,85 +5,94 @@ const pg = require('pg');
 const client = new pg.Client(connectionString);
 client.connect();
 
+const applyMultipleFlters = (course, servings, allergen, protein, isUsers) => {
+    let filters = '';
+
+    if(isUsers === true)
+        filters += 'WHERE author = $1';
+    
+    if (course) {
+        course = course.split(',');
+
+        for(let i = 0; i<course.length; i++){
+            let courseFilter = course[i].replace(/([a-z])([A-Z])/g, '$1 $2')
+            if(!filters.length){
+                filters += `WHERE (course = '${courseFilter}'`
+            }
+            else if(i < 1){
+                filters += ` AND (course = '${courseFilter}'`
+            }
+            else{
+                filters += ` OR course = '${courseFilter}'`
+            }
+        }
+        filters += ')';
+    }
+    if (servings) {
+        servings = servings.split(',');
+
+        for(let i = 0; i<course.length; i++){
+            if(!filters.length){
+                filters += `WHERE (servings = '${servings[i]}'`
+            }
+            else if(i < 1){
+                filters += ` AND (servings = '${servings[i]}'`
+            }
+            else{
+                filters += ` OR servings = '${servings[i]}'`
+            }
+        }
+        filters += ')';
+    }
+    if (protein) {
+        proteins = protein.split(',');
+        
+        for(let i = 0; i < proteins.length; i++){
+            if(!filters.length){
+                filters += `WHERE (('${proteins[i]}' = ANY (protein))`
+            }
+            else if(i < 1){
+                filters += ` AND (('${proteins[i]}' = ANY (protein))`
+            }
+            else{
+                filters += ` OR ('${proteins[i]}' = ANY (protein))`
+            }
+        }
+        filters += ')';
+    }
+    if (allergen) {
+        allergens = allergen.split(',');
+        allergenList = allergens.map((value) => filters.length ? ` AND NOT ('${value}' = ANY (allergens))` : `WHERE NOT ('${value}' = ANY (allergens))`).join(' ');
+        filters += allergenList;
+    }
+
+    return filters;
+}
+
+const applyPagination = (limit, offset) => {
+    let pageFilter = ''
+
+    if(limit){
+        pageFilter += ` LIMIT '${limit}'`;
+    }
+    if(offset){
+        pageFilter += ` OFFSET '${offset}'`;
+    }
+
+    return pageFilter;
+}
+
 const getRecipes = async (req,res)=>{
     try
     {
         const { course, servings, allergen, protein, limit, offset } = req.query;
 
-        let filters = '';
-        if (course) {
-            course = course.split(',');
-            for(let i = 0; i<course.length; i++){
-                let courseFilter = course[i].replace(/([a-z])([A-Z])/g, '$1 $2')
-                if(!filters.length){
-                    filters += `WHERE (course = '${courseFilter}'`
-                }
-                else if(i < 1){
-                    filters += ` AND (course = '${courseFilter}'`
-                }
-                else{
-                    filters += ` OR course = '${courseFilter}'`
-                }
-            }
-            filters += ')'
-        }
-        if (servings) {
-            course = servings.split(',');
-            for(let i = 0; i<course.length; i++){
-                if(!filters.length){
-                    filters += `WHERE (servings = '${servings}'`
-                }
-                else if(i < 1){
-                    filters += ` AND (servings = '${servings}'`
-                }
-                else{
-                    filters += ` OR servings = '${servings}'`
-                }
-            }
-            filters += ')'
-        }
-        if (protein) {
-            proteins = protein.split(',');
-            
-            for(let i = 0; i < proteins.length; i++){
-                if(!filters.length){
-                    filters += `WHERE (('${proteins[i]}' = ANY (protein))`
-                }
-                else if(i < 1){
-                    filters += ` AND (('${proteins[i]}' = ANY (protein))`
-                }
-                else{
-                    filters += ` OR ('${proteins[i]}' = ANY (protein))`
-                }
-            }
-            filters += ')'
-        }
-        if (allergen) {
-            allergens = allergen.split(',');
-            allergenList = allergens.map((value) => filters.length ? ` AND NOT ('${value}' = ANY (allergens))` : `WHERE NOT ('${value}' = ANY (allergens))`).join(' ')
-            filters += allergenList
-        }
-        let getQuery = `SELECT * FROM recipes ${filters} ORDER BY added`
-        if(limit){
-            getQuery += ` LIMIT '${limit}'`;
-        }
-        if(offset){
-            getQuery += ` OFFSET '${offset}'`;
-        }
+        let getQuery = `SELECT * FROM recipes ${applyMultipleFlters(course, servings, allergen, protein)} ORDER BY added`
+
+        getQuery += applyPagination(limit, offset)
         
         const response = await client.query(getQuery);
         res.status(200).json(response.rows);
-    }
-    catch(error){
-        res.send("Error: "+error);
-    }
-};
-
-const getRecipeById = async(req,res) => {
-    try{
-        const id = req.params.id;
-        const response = await client.query('SELECT * FROM recipes WHERE recipe_id = $1',[id]);
-        res.json(response.rows);
     }
     catch(error){
         res.send("Error: "+error);
@@ -95,14 +104,22 @@ const getRecipeByUser = async(req,res) => {
         const author = req.params.author;
         const { limit, offset } = req.query;
 
-        let getQuery = `SELECT * FROM recipes WHERE author = $1 ORDER BY added`
+        let getQuery = `SELECT * FROM recipes ${applyMultipleFlters(course, servings, allergen, protein)} ORDER BY added`
 
-        if(limit)
-            getQuery += ` LIMIT '${limit}'`;
-        if(offset)
-            getQuery += ` OFFSET '${offset}'`;
+        getQuery += applyPagination(limit, offset)
 
         const response = await client.query(getQuery,[author]);
+        res.json(response.rows);
+    }
+    catch(error){
+        res.send("Error: "+error);
+    }
+};
+
+const getRecipeById = async(req,res) => {
+    try{
+        const id = req.params.id;
+        const response = await client.query('SELECT * FROM recipes WHERE recipe_id = $1',[id]);
         res.json(response.rows);
     }
     catch(error){
