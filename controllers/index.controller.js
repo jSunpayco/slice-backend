@@ -5,11 +5,18 @@ const pg = require('pg');
 const client = new pg.Client(connectionString);
 client.connect();
 
-const applyMultipleFlters = (course, servings, allergen, protein, isUsers) => {
+const applyMultipleFlters = (name, course, servings, allergen, protein, isUsers) => {
     let filters = '';
 
     if(isUsers === true)
         filters += 'WHERE author = $1';
+    
+    if (name) {
+        if(!filters.length)
+            filters += `WHERE name LIKE '%${name}%'`
+        else
+            `AND name LIKE '%${name}%'`
+    }
     
     if (course) {
         course = course.split(',');
@@ -91,9 +98,9 @@ const applyPagination = (limit, offset) => {
 const getRecipes = async (req,res)=>{
     try
     {
-        const { course, servings, allergen, protein, limit, offset } = req.query;
+        const { name, course, servings, allergen, protein, limit, offset } = req.query;
 
-        let getQuery = `SELECT * FROM recipes ${applyMultipleFlters(course, servings, allergen, protein, false)} ORDER BY added`
+        let getQuery = `SELECT * FROM recipes ${applyMultipleFlters(name, course, servings, allergen, protein, false)} ORDER BY added`
 
         getQuery += applyPagination(limit, offset)
 
@@ -107,9 +114,9 @@ const getRecipes = async (req,res)=>{
 
 const getRecipeByUser = async(req,res) => {
     try{
-        const { course, servings, allergen, protein, limit, offset } = req.query;
+        const { name, course, servings, allergen, protein, limit, offset } = req.query;
 
-        let getQuery = `SELECT * FROM recipes ${applyMultipleFlters(course, servings, allergen, protein, true)} ORDER BY added`
+        let getQuery = `SELECT * FROM recipes ${applyMultipleFlters(name, course, servings, allergen, protein, true)} ORDER BY added`
 
         getQuery += applyPagination(limit, offset)
 
