@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require('cors');
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://slice-recipes.vercel.app/']
+  origin: ['http://localhost:3000', 'https://slice-recipes.vercel.app']
 }));
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
