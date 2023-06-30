@@ -141,11 +141,11 @@ const getRecipeById = async(req,res) => {
 
 const createRecipe = async (req,res)=>{
     try{
-        const {recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration, ingredients, steps, image} = req.body;
+        const {name, author, allergens, course, about, protein, ismeat, servings, ismins, duration, ingredients, steps, image} = req.body;
 
-        let createQuery = 'INSERT INTO recipes(recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration, ingredients, steps, added, image)';
-        createQuery += ' VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CURRENT_TIMESTAMP::timestamp, $14)';
-        let createValues = [recipe_id, name, author, allergens, course, about, protein, ismeat, servings, ismins, duration, ingredients, steps, image];
+        let createQuery = 'INSERT INTO recipes(name, author, allergens, course, about, protein, ismeat, servings, ismins, duration, ingredients, steps, added, image)';
+        createQuery += ' VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CURRENT_TIMESTAMP::timestamp, $13)';
+        let createValues = [name, author, allergens, course, about, protein, ismeat, servings, ismins, duration, ingredients, steps, image];
 
         const response = await client.query(createQuery, createValues);
 
