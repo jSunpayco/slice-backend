@@ -11,6 +11,8 @@ router.get('/recipes',getRecipes);
 router.get('/recipes/:id',getRecipeById);
 router.get('/myrecipes/:author',getRecipeByUser);
 
+const validAllergens = ["Fish", "Shellfish", "Milk", "Eggs", "Peanuts", "Tree Nuts", "Soy", "Gluten"];
+
 router.post(
     '/recipes',
     [
@@ -26,6 +28,10 @@ router.post(
         .isLength({ max: 100 }).withMessage('Description cannot exceed 100 characters')
         .matches(/^[a-zA-Z0-9 ]+$/i).withMessage('Description can contain only letters and numbers')
         .trim(),
+      body('allergens')
+        .optional()
+        .isArray().withMessage('Allergens must be an array')
+        .isIn([validAllergens]).withMessage('Invalid allergens detected')
     ],
     (req, res) => {
       const errors = validationResult(req);
