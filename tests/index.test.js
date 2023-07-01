@@ -7,7 +7,6 @@ const {closeClient} = require('../controllers/index.controller');
 describe('All tests', () => {
 
   const newRecipe = {
-    recipe_id: 9999,
     author: "RubberyTurnip",
     name: "Earl Grey Ice Cream",
     allergens: ["Milk", "Eggs"],
@@ -21,11 +20,11 @@ describe('All tests', () => {
     ismins: false,
     duration: "2",
     steps: ["Mix Milk", "Mix Eggs", "Add Vanilla", "Freeze"],
-    ingredients: ["Milk", "Eggs", "Vanilla"]
+    ingredients: ["Milk", "Eggs", "Vanilla"],
+    image: "rubberyturnip_earl_gray_ice_cream"
   }
 
   const updatedRecipe = {
-    recipe_id: 9999,
     author: "RubberyTurnip",
     name: "Earl Grey Ice Cream",
     allergens: ["Milk", "Eggs"],
@@ -39,7 +38,8 @@ describe('All tests', () => {
     ismins: false,
     duration: "2",
     steps: ["Mix Milk", "Mix Eggs", "Add Vanilla", "Freeze"],
-    ingredients: ["Milk", "Eggs", "Vanilla"]
+    ingredients: ["Milk", "Eggs", "Vanilla"],
+    image: "rubberyturnip_earl_gray_ice_cream"
   }
 
   beforeAll(done => {
