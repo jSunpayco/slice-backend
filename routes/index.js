@@ -12,6 +12,9 @@ router.get('/recipes/:id',getRecipeById);
 router.get('/myrecipes/:author',getRecipeByUser);
 
 const validAllergens = ["Fish", "Shellfish", "Milk", "Eggs", "Peanuts", "Tree Nuts", "Soy", "Gluten"];
+const validCourses = ["Starter", "Breakfast", "Main Dish", "Side Dish", "Dessert"];
+const validProteins = ["Beef", "Pork", "Poultry", "Fish", "Shellfish", "Vegan", "Vegetarian"];
+const validServings = ["1", "2", "3-4", "5-6", "7-10", "11+"];
 
 router.post(
     '/recipes',
@@ -31,7 +34,7 @@ router.post(
       body('allergens')
         .optional()
         .isArray().withMessage('Allergens must be an array')
-        .isIn([validAllergens]).withMessage('Invalid allergens detected')
+        .isIn([validAllergens]).withMessage('Invalid allergens detected'),
     ],
     (req, res) => {
       const errors = validationResult(req);
