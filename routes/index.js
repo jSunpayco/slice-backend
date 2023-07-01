@@ -19,7 +19,13 @@ router.post(
         .isLength({ min: 4 }).withMessage('Name must be at least 4 characters long')
         .isLength({ max: 30 }).withMessage('Name cannot exceed 30 characters')
         .matches(/^[a-zA-Z0-9 ]+$/i).withMessage('Name can contain only letters and numbers')
-        .trim()
+        .trim(),
+      body('about')
+        .notEmpty().withMessage('Description is required')
+        .isLength({ min: 10 }).withMessage('Description must be at least 10 characters')
+        .isLength({ max: 100 }).withMessage('Description cannot exceed 100 characters')
+        .matches(/^[a-zA-Z0-9 ]+$/i).withMessage('Description can contain only letters and numbers')
+        .trim(),
     ],
     (req, res) => {
       const errors = validationResult(req);
