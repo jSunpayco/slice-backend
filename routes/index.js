@@ -44,17 +44,22 @@ router.post(
         .notEmpty().withMessage('Protein is required')
         .isArray().withMessage('Protein has an invalid format') // must be array
         .custom((value) => {
-          const meatFound = value.filter((protein) => validProteinsMeat.includes(protein));
-          const vegFound = value.filter((protein) => validProteinsVeg.includes(protein));
+          const validProtein = value.some((protein) =>
+            validProteinsMeat.includes(protein) || validProteinsVeg.includes(protein)
+          );
 
-          if (
-            (meatFound.length === 0 && vegFound.length === 0) ||
-            (meatFound.length > 0 && vegFound.length > 0)
-          ) {
-            throw new Error('Invalid proteins detected');
-          }
-          else if(vegFound.length == 2)
-            throw new Error('Protein cannot be both Vegetarian and Vegan')
+          if (!validProtein)
+            throw new Error('Invalid protein detected');
+
+          const inBothProtein = value.some((protein) =>
+            validProteinsMeat.includes(protein) && validProteinsVeg.includes(protein)
+          );
+
+          if (inBothProtein)
+            throw new Error('Protein must either contain meat or not');
+
+          if(value.length === 2 && validProteinsVeg.includes(value[0]) && validProteinsVeg.includes(value[1]))
+            throw new Error('Protein cannot be both Vegetarian and Vegan');
 
           return true;
         }),
