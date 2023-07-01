@@ -13,7 +13,8 @@ router.get('/myrecipes/:author',getRecipeByUser);
 
 const validAllergens = ["Fish", "Shellfish", "Milk", "Eggs", "Peanuts", "Tree Nuts", "Soy", "Gluten"];
 const validCourses = ["Starter", "Breakfast", "Main Dish", "Side Dish", "Dessert"];
-const validProteins = ["Beef", "Pork", "Poultry", "Fish", "Shellfish", "Vegan", "Vegetarian"];
+const validProteinsMeat = ["Beef", "Pork", "Poultry", "Fish", "Shellfish", "Vegan", "Vegetarian"];
+const validProteinsVeg = ["Vegan", "Vegetarian"];
 const validServings = ["1", "2", "3-4", "5-6", "7-10", "11+"];
 
 router.post(
@@ -33,12 +34,30 @@ router.post(
         .trim(),
       body('allergens')
         .optional()
-        .isArray().withMessage('Allergens must be an array')
+        .isArray().withMessage('Allergens has an invalid format') // must be array
         .isIn([validAllergens]).withMessage('Invalid allergens detected'),
       body('course')
         .notEmpty().withMessage('Course is required')
         .isIn([validCourses]).withMessage('Invalid course detected')
         .trim(),
+      body('protein')
+        .notEmpty().withMessage('Protein is required')
+        .isArray().withMessage('Protein has an invalid format') // must be array
+        .custom((value) => {
+          const meatFound = value.filter((protein) => validProteinsMeat.includes(protein));
+          const vegFound = value.filter((protein) => validProteinsVeg.includes(protein));
+
+          if (
+            (meatFound.length === 0 && vegFound.length === 0) ||
+            (meatFound.length > 0 && vegFound.length > 0)
+          ) {
+            throw new Error('Invalid proteins detected');
+          }
+          else if(vegFound.length == 2)
+            throw new Error('Protein cannot be both Vegetarian and Vegan')
+
+          return true;
+        }),
     ],
     (req, res) => {
       const errors = validationResult(req);
