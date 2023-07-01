@@ -35,6 +35,10 @@ router.post(
         .optional()
         .isArray().withMessage('Allergens must be an array')
         .isIn([validAllergens]).withMessage('Invalid allergens detected'),
+      body('course')
+        .notEmpty().withMessage('Course is required')
+        .isIn([validCourses]).withMessage('Invalid course detected')
+        .trim(),
     ],
     (req, res) => {
       const errors = validationResult(req);
