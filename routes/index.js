@@ -63,6 +63,10 @@ router.post(
 
           return true;
         }),
+        body('servings')
+          .notEmpty().withMessage('Serving is required')
+          .isIn([validServings]).withMessage('Invalid serving detected')
+          .trim(),
     ],
     (req, res) => {
       const errors = validationResult(req);
