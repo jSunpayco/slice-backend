@@ -50,6 +50,38 @@ describe('All tests', () => {
     closeClient();
   })
 
+  test('create recipe with empty name', async () => {
+    const temp = newRecipe;
+    temp.name = "";
+
+    const response = await request(app).post('/recipes').send(newRecipe);
+    expect(response.body.errors[0].msg).toEqual("Name is required");
+  })
+
+  test('create recipe with name less than 4 characters', async () => {
+    const temp = newRecipe;
+    temp.name = "r2d";
+
+    const response = await request(app).post('/recipes').send(newRecipe);
+    expect(response.body.errors[0].msg).toEqual("Name must be at least 4 characters long");
+  })
+
+  test('create recipe with name more than 30 characters', async () => {
+    const temp = newRecipe;
+    temp.name = "asdaos8amudahsdaasdaos8amudahsda";
+
+    const response = await request(app).post('/recipes').send(newRecipe);
+    expect(response.body.errors[0].msg).toEqual("Name cannot exceed 30 characters");
+  })
+
+  test('create recipe with name that has special symbols', async () => {
+    const temp = newRecipe;
+    temp.name = "Mich@el Jack Son";
+
+    const response = await request(app).post('/recipes').send(newRecipe);
+    expect(response.body.errors[0].msg).toEqual("Name can contain only letters and numbers");
+  })
+
   test('creates a new recipe', async () => {
     const response = await request(app).post('/recipes').send(newRecipe);
 
