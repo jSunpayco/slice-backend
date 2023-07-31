@@ -47,7 +47,9 @@ describe('All tests', () => {
   })
   
   afterAll(() => {
-    closeClient();
+    setTimeout(() => {
+      closeClient();
+    }, 1000);
   })
 
   test('create recipe with empty name', async () => {
