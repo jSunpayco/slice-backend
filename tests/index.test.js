@@ -42,6 +42,8 @@ describe('All tests', () => {
     image: "rubberyturnip_earl_gray_ice_cream"
   }
 
+  var newId = 0;
+
   beforeAll(done => {
     done()
   })
@@ -49,7 +51,7 @@ describe('All tests', () => {
   afterAll(() => {
     setTimeout(() => {
       closeClient();
-    }, 1000);
+    }, 700);
   })
 
   test('create recipe with empty name', async () => {
@@ -82,10 +84,11 @@ describe('All tests', () => {
 
     expect(response.statusCode).toBe(200)
     expect(response.body.message).toEqual('Recipe Added Successfully');
+    newId = response.body.recipe_id;
   })
 
   test('updates the about column', async () => {
-    const response = await request(app).put('/recipes/9999').send({
+    const response = await request(app).put(`/recipes/${newId}`).send({
       updates:{about: "Homemade ice cream flavored with earl grey tea"}
     });
 
@@ -94,7 +97,7 @@ describe('All tests', () => {
   });
 
   test('retrieves the new recipe', async () => {
-    const response = await request(app).get('/recipes/9999');
+    const response = await request(app).get(`/recipes/${newId}`);
 
     expect(response.statusCode).toBe(200)
     expect(response.body.length).toBeGreaterThan(0);
@@ -102,9 +105,9 @@ describe('All tests', () => {
   });
 
   test('deletes the new recipe', async () => {
-    const response = await request(app).delete('/recipes/9999');
+    const response = await request(app).delete(`/recipes/${newId}`);
 
     expect(response.statusCode).toBe(200)
-    expect(response.body).toEqual('Recipe 9999 deleted successfully');
+    expect(response.body).toEqual(`Recipe ${newId} deleted successfully`);
   });
 });

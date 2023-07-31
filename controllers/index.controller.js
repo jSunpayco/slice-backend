@@ -144,16 +144,14 @@ const createRecipe = async (req,res)=>{
         const {name, author, allergens, course, about, protein, ismeat, servings, ismins, duration, ingredients, steps, image} = req.body;
 
         let createQuery = 'INSERT INTO recipes(name, author, allergens, course, about, protein, ismeat, servings, ismins, duration, ingredients, steps, added, image)';
-        createQuery += ' VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CURRENT_TIMESTAMP::timestamp, $13)';
+        createQuery += ' VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CURRENT_TIMESTAMP::timestamp, $13) RETURNING recipe_id';
         let createValues = [name, author, allergens, course, about, protein, ismeat, servings, ismins, duration, ingredients, steps, image];
 
         const response = await client.query(createQuery, createValues);
 
         res.status(200).json({
             message: 'Recipe Added Successfully',
-            body:{
-                recipe:response.rows[0]
-            }
+            recipe_id:response.rows[0].recipe_id
         });
     }
     catch(error){
