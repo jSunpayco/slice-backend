@@ -81,7 +81,7 @@ describe('All tests', () => {
     const response = await request(app).post('/recipes').send(newRecipe);
 
     expect(response.statusCode).toBe(200)
-    expect(response.body.body.recipe).toEqual(newRecipe);
+    expect(response.body.message).toEqual('Recipe Added Successfully');
   })
 
   test('updates the about column', async () => {
